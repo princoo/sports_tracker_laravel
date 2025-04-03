@@ -38,6 +38,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'status' => 'boolean',
+        'password' => 'hashed',
     ];
 
     public function role(): BelongsTo

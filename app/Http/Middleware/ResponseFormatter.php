@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\JsonResponse;
 
-
 class ResponseFormatter
 {
     /**
@@ -17,7 +16,8 @@ class ResponseFormatter
      */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        $response = $next($request);
+        
         // If the response is not JSON, return it as is.
         if (!$response instanceof JsonResponse) {
             return $response;
@@ -25,7 +25,7 @@ class ResponseFormatter
 
         // Format the JSON response
         return response()->json([
-            'status' => true,
+            // 'status' => true,
             'statusCode' => $response->getStatusCode(),
             'result' => $response->getData(),
         ], $response->getStatusCode());

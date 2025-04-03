@@ -1,12 +1,15 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');
+Route::get('/signup', [UserController::class, 'register']);
 
-Route::get('/ok', function () {
-    return "fffff";
+Route::get('/ok', function (Request $request, Response $response) {
+    return response()->json([
+        'status' => 'success',
+        'message' => 'This is a JSON response',
+    ]);
 });
