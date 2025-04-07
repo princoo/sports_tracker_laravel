@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuids;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids;
     
     protected $primaryKey = 'id';
     public $incrementing = false;
@@ -37,6 +38,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'status' => 'boolean',
+        'password' => 'hashed',
     ];
 
     public function role(): BelongsTo
