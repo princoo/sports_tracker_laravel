@@ -3,6 +3,7 @@
 namespace App\Services\Role;
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Support\Collection;
 
 class RoleService
@@ -26,24 +27,27 @@ class RoleService
     /**
      * Assign role to user
      */
-    // public function assignRoleToUser(string $userId, string $roleName): bool
-    // {
-    //     // try {
-    //     //     $role = $this->getRoleByName($roleName);
-    //     //     if (!$role) {
-    //     //         return false;
-    //     //     }
+    public function changeUserRole(string $userId, string $roleId)
+    {
+        $user = User::find($userId);
 
-    //     //     $user = app()->make(\App\Services\User\UserService::class)->getUserById($userId);
-    //     //     if (!$user) {
-    //     //         return false;
-    //     //     }
+        if (!$user) {
+            return null;
+        }
 
-    //     //     $user->roles()->syncWithoutDetaching([$role->id]);
-    //     //     return true;
-    //     // } catch (\Exception $e) {
-    //     //     $this->handleException($e, 'Error assigning role to user');
-    //     //     return false;
-    //     // }
-    // }
+        $user->role_id = $roleId;
+        $user->save();
+
+        // Return the updated user with the role relationship
+        return User::with('role')->find($userId);
+    }
+    public function getUserRole(string $userId)
+    {
+        $user = User::with('role')->find($userId);
+        if (!$user) {
+            return null;
+        }
+
+        return ['role' => $user->role];
+    }
 }
