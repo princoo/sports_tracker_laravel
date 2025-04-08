@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Middleware\CheckUserExists;
+use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\ResponseFormatter;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(ResponseFormatter::class);
-        $middleware->alias(['checkUserExists', CheckUserExists::class]);
+        $middleware->alias(['checkUserExists', CheckUserExists::class, 'jwt.auth', JwtMiddleware::class, 'role', RoleMiddleware::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Handle HTTP exceptions
