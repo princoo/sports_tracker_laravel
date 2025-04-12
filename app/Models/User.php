@@ -51,6 +51,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(CoachOnCenter::class, 'user_id');
     }
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class, 'user_id');
+    }
 
     public function testsRecorded(): HasMany
     {

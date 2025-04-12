@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Middleware\CheckUserExists;
+use App\Http\Middleware\Coach\CheckCoachOnSiteExists;
 use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\ResponseFormatter;
 use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\Site\CheckSiteExists;
+use App\Http\Middleware\Site\CheckSiteIdExists;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,7 +24,20 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(ResponseFormatter::class);
-        $middleware->alias(['checkUserExists', CheckUserExists::class, 'jwt.auth', JwtMiddleware::class, 'role', RoleMiddleware::class]);
+        $middleware->alias([
+            'checkUserExists',
+            CheckUserExists::class,
+            'jwt.auth',
+            JwtMiddleware::class,
+            'role',
+            RoleMiddleware::class,
+            'CheckSiteExists',
+            CheckSiteExists::class,
+            'CheckSiteIdExists',
+            CheckSiteIdExists::class,
+            'CheckCoachOnSiteExists',
+            CheckCoachOnSiteExists::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Handle HTTP exceptions
