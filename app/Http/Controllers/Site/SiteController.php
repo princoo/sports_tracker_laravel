@@ -16,10 +16,11 @@ class SiteController extends Controller
 
     public function getAllSites(Request $request)
     {
+        $user = $request->user();
         $sites = $this->siteService->getAllSites();
         return response()->json([
             'message' => 'Sites retrieved successfully',
-            'data' => $sites
+            'data' => $sites,
         ]);
     }
     public function createSite(Request $request)
