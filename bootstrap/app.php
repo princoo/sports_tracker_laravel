@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Middleware\CheckUserExists;
+use App\Http\Middleware\Coach\CheckCoachAssignedToSite;
 use App\Http\Middleware\Coach\CheckCoachOnSiteExists;
+use App\Http\Middleware\Coach\CheckPlayerCoach;
 use App\Http\Middleware\JwtMiddleware;
+use App\Http\Middleware\Player\CheckPlayerExists;
 use App\Http\Middleware\ResponseFormatter;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\Site\CheckSiteExists;
@@ -11,7 +14,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+
 // use Throwable;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -36,10 +41,25 @@ return Application::configure(basePath: dirname(__DIR__))
             'CheckSiteIdExists',
             CheckSiteIdExists::class,
             'CheckCoachOnSiteExists',
-            CheckCoachOnSiteExists::class
+            CheckCoachOnSiteExists::class,
+            'CheckPlayerExists',
+            CheckPlayerExists::class,
+            'CheckCoachAssignedToSite',
+            CheckCoachAssignedToSite::class,
+            'CheckPlayerCoach',
+            CheckPlayerCoach::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // Handle Authentication exceptions
+        $exceptions->render(function (AuthenticationException $exception, Request $request) {
+            return response()->json([
+                'status' => false,
+                'statusCode' => 401,
+                'message' => 'Unauthorized. Authentication required.',
+                'result' => null,
+            ], 401);
+        });
         // Handle HTTP exceptions
         $exceptions->render(function (HttpException $exception, Request $request) {
             $status = $exception->getStatusCode();
