@@ -4,6 +4,7 @@ use App\Http\Controllers\Coach\CoachOnSiteController;
 use App\Http\Controllers\Player\PlayerController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Site\SiteController;
+use App\Http\Controllers\Test\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckUserExists;
 use App\Http\Middleware\Coach\CheckCoachAssignedToSite;
@@ -15,6 +16,9 @@ use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\Site\CheckSiteExists;
 use App\Http\Middleware\Site\CheckSiteIdExists;
 use App\Http\Middleware\Site\CheckUpdatedNameExists;
+use App\Http\Middleware\Test\CheckTestIdExists;
+use App\Http\Middleware\Test\CheckTestNameExists;
+use App\Http\Middleware\Test\CheckUpdatedNameExists as TestCheckUpdatedNameExists;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -49,3 +53,10 @@ Route::get('/players/{site_id}', [PlayerController::class, 'findAllBySite'])->mi
 Route::get('/players/single/{player_id}', [PlayerController::class, 'findOne'])->middleware('auth:api');
 Route::patch('/players/{player_id}', [PlayerController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,TECHNICIAN,COACH',CheckPlayerExists::class, CheckPlayerCoach::class);
 Route::delete('/players/{player_id}', [PlayerController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':HSO,TECHNICIAN,COACH',CheckPlayerExists::class, CheckPlayerCoach::class);
+
+// Test routes
+Route::post('/test', [TestController::class, 'create'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckTestNameExists::class);
+Route::get('/test', [TestController::class, 'findAll'])->middleware('auth:api');
+Route::get('/test/{test_id}', [TestController::class, 'findOne'])->middleware('auth:api', CheckTestIdExists::class);
+Route::patch('/test/{test_id}', [TestController::class, 'update'])->middleware('auth:api',RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class, TestCheckUpdatedNameExists::class);
+Route::delete('/test/{test_id}', [TestController::class, 'remove'])->middleware('auth:api',RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class);
