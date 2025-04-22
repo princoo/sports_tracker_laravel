@@ -13,6 +13,10 @@ use App\Http\Middleware\Site\CheckSiteIdExists;
 use App\Http\Middleware\Test\CheckTestIdExists;
 use App\Http\Middleware\Test\CheckTestNameExists;
 use App\Http\Middleware\Test\CheckUpdatedNameExists;
+use App\Http\Middleware\TestSession\CheckActiveSessions;
+use App\Http\Middleware\TestSession\CheckExpiredSessions;
+use App\Http\Middleware\TestSession\CheckSessionIdExists;
+use App\Http\Middleware\TestSession\CheckSessionInUse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -57,6 +61,14 @@ return Application::configure(basePath: dirname(__DIR__))
             CheckUpdatedNameExists::class,
             'CheckTestNameExists',
             CheckTestNameExists::class,
+            'CheckExpiredSessions',
+            CheckExpiredSessions::class,
+            'CheckSessionIdExists',
+            CheckSessionIdExists::class,
+            'CheckSessionInUse',
+            CheckSessionInUse::class,
+            'CheckActiveSessions',
+            CheckActiveSessions::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
