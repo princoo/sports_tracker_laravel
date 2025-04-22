@@ -5,6 +5,7 @@ use App\Http\Controllers\Player\PlayerController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Test\TestController;
+use App\Http\Controllers\TestSession\TestSessionController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckUserExists;
 use App\Http\Middleware\Coach\CheckCoachAssignedToSite;
@@ -19,6 +20,10 @@ use App\Http\Middleware\Site\CheckUpdatedNameExists;
 use App\Http\Middleware\Test\CheckTestIdExists;
 use App\Http\Middleware\Test\CheckTestNameExists;
 use App\Http\Middleware\Test\CheckUpdatedNameExists as TestCheckUpdatedNameExists;
+use App\Http\Middleware\TestSession\CheckActiveSessions;
+use App\Http\Middleware\TestSession\CheckExpiredSessions;
+use App\Http\Middleware\TestSession\CheckSessionIdExists;
+use App\Http\Middleware\TestSession\CheckSessionInUse;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -51,12 +56,20 @@ Route::post('/players/{site_id}', [PlayerController::class, 'create'])->middlewa
 Route::get('/players', [PlayerController::class, 'findAll'])->middleware('auth:api');;
 Route::get('/players/{site_id}', [PlayerController::class, 'findAllBySite'])->middleware('auth:api');
 Route::get('/players/single/{player_id}', [PlayerController::class, 'findOne'])->middleware('auth:api');
-Route::patch('/players/{player_id}', [PlayerController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,TECHNICIAN,COACH',CheckPlayerExists::class, CheckPlayerCoach::class);
-Route::delete('/players/{player_id}', [PlayerController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':HSO,TECHNICIAN,COACH',CheckPlayerExists::class, CheckPlayerCoach::class);
+Route::patch('/players/{player_id}', [PlayerController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,TECHNICIAN,COACH', CheckPlayerExists::class, CheckPlayerCoach::class);
+Route::delete('/players/{player_id}', [PlayerController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':HSO,TECHNICIAN,COACH', CheckPlayerExists::class, CheckPlayerCoach::class);
 
 // Test routes
 Route::post('/test', [TestController::class, 'create'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckTestNameExists::class);
 Route::get('/test', [TestController::class, 'findAll'])->middleware('auth:api');
 Route::get('/test/{test_id}', [TestController::class, 'findOne'])->middleware('auth:api', CheckTestIdExists::class);
-Route::patch('/test/{test_id}', [TestController::class, 'update'])->middleware('auth:api',RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class, TestCheckUpdatedNameExists::class);
-Route::delete('/test/{test_id}', [TestController::class, 'remove'])->middleware('auth:api',RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class);
+Route::patch('/test/{test_id}', [TestController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class, TestCheckUpdatedNameExists::class);
+Route::delete('/test/{test_id}', [TestController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class);
+
+// TestSession routes
+Route::post('/test-session', [TestSessionController::class, 'create'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckActiveSessions::class);
+Route::get('/test-session/session/active', [TestSessionController::class, 'findActive'])->middleware('auth:api');
+Route::get('/test-session', [TestSessionController::class, 'findAll'])->middleware('auth:api');
+Route::get('/test-session/{session_id}', [TestSessionController::class, 'findOne'])->middleware('auth:api', CheckSessionIdExists::class);
+Route::patch('/test-session/{session_id}', [TestSessionController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckSessionIdExists::class, CheckExpiredSessions::class);
+Route::delete('/test-session/{session_id}', [TestSessionController::class, 'remove'])->middleware('auth:api', CheckSessionIdExists::class, CheckSessionInUse::class);
