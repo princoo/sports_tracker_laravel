@@ -63,4 +63,7 @@ class TestSession extends Model
     {
         return $this->hasMany(PlayerTest::class, 'session_id');
     }
+    /**
+     * Get the tests associated with this session.
+     */
 }

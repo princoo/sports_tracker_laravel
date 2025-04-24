@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Coach\CoachOnSiteController;
 use App\Http\Controllers\Player\PlayerController;
+use App\Http\Controllers\PlayerTest\PlayerTestController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Test\TestController;
@@ -13,6 +14,10 @@ use App\Http\Middleware\Coach\CheckCoachOnSiteExists;
 use App\Http\Middleware\Coach\CheckPlayerCoach;
 use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\Player\CheckPlayerExists;
+use App\Http\Middleware\PlayerTest\ActiveSessionMiddleware;
+use App\Http\Middleware\PlayerTest\CheckDuplicateSessionTest;
+use App\Http\Middleware\PlayerTest\CheckPlayerTestIdExists;
+use App\Http\Middleware\PlayerTest\CheckTestMetricsIdExists;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\Site\CheckSiteExists;
 use App\Http\Middleware\Site\CheckSiteIdExists;
@@ -73,3 +78,12 @@ Route::get('/test-session', [TestSessionController::class, 'findAll'])->middlewa
 Route::get('/test-session/{session_id}', [TestSessionController::class, 'findOne'])->middleware('auth:api', CheckSessionIdExists::class);
 Route::patch('/test-session/{session_id}', [TestSessionController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckSessionIdExists::class, CheckExpiredSessions::class);
 Route::delete('/test-session/{session_id}', [TestSessionController::class, 'remove'])->middleware('auth:api', CheckSessionIdExists::class, CheckSessionInUse::class);
+
+// PlayerTest routes
+Route::post('/player-test/{site_id}/{test_id}/{player_id}', [PlayerTestController::class, 'create'])->middleware('auth:api', RoleMiddleware::class . ':HSO,COACH', CheckSiteIdExists::class, CheckTestIdExists::class, CheckPlayerExists::class, ActiveSessionMiddleware::class, CheckDuplicateSessionTest::class);
+Route::get('/player-test', [PlayerTestController::class, 'findAll'])->middleware('auth:api');
+Route::get('/player-test/player/{player_id}', [PlayerTestController::class, 'findAllByPlayer'])->middleware('auth:api');
+Route::get('/player-test/session/{session_id}', [PlayerTestController::class, 'findBySession'])->middleware('auth:api', CheckSessionIdExists::class);
+Route::get('/player-test/{player_test_id}', [PlayerTestController::class, 'findOne'])->middleware('auth:api');
+Route::patch('/player-test/{site_id}/{test_metric_id}', [PlayerTestController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':TECHNICIAN,COACH', CheckSiteIdExists::class, CheckTestMetricsIdExists::class);
+Route::patch('/player-test/{site_id}/{player_test_id}', [PlayerTestController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':HSO,COACH', CheckSiteIdExists::class, CheckPlayerTestIdExists::class);
