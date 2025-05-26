@@ -24,8 +24,8 @@ class CheckTestMetricsIdExists
                 'message' => 'TestMetric does not exists',
             ], 400);
         }
-        $requiredMetrics = $testMetric->playerTest->test->requiredMetrics;
-        $request->merge(['requiredMetrics' => $requiredMetrics]);
+        $required_metrics = $testMetric->playerTest->test->required_metrics;
+        $request->merge(['required_metrics' => $required_metrics]);
         return $next($request);
     }
 }

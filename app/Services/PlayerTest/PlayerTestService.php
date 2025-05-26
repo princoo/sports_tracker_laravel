@@ -94,7 +94,7 @@ class PlayerTestService
         // Get all player tests for the given session
         $playerTests = PlayerTest::where('session_id', $sessionId)
             ->with([
-                'testSession.tests.test:id,name',
+                'testSession.sessionTests.test:id,name',
                 'metrics',
                 'test:id,name',
                 'player:id,first_name,last_name'
@@ -105,53 +105,54 @@ class PlayerTestService
         // Group the data by playerId
         $groupedByPlayer = [];
 
-        foreach ($playerTests as $playerTest) {
-            $playerId = $playerTest->player_id;
+        // foreach ($playerTests as $playerTest) {
+        //     $playerId = $playerTest->player_id;
 
-            if (!isset($groupedByPlayer[$playerId])) {
-                $groupedByPlayer[$playerId] = [
-                    'playerId' => $playerId,
-                    'player' => [
-                        'firstName' => $playerTest->player->first_name,
-                        'lastName' => $playerTest->player->last_name,
-                    ],
-                    'sessionTests' => $playerTest->testSession->tests->map(function ($sessionTest) {
-                        return [
-                            'test' => [
-                                'id' => $sessionTest->test->id,
-                                'name' => $sessionTest->test->name,
-                            ]
-                        ];
-                    })->toArray(),
-                    'tests' => [],
-                ];
-            }
+        //     if (!isset($groupedByPlayer[$playerId])) {
+        //         $groupedByPlayer[$playerId] = [
+        //             'playerId' => $playerId,
+        //             'player' => [
+        //                 'firstName' => $playerTest->player->first_name,
+        //                 'lastName' => $playerTest->player->last_name,
+        //             ],
+        //             'sessionTests' => $playerTest->testSession->sessionTests->test->map(function ($sessionTest) {
+        //                 return [
+        //                     'test' => [
+        //                         'id' => $sessionTest->id,
+        //                         'name' => $sessionTest->name,
+        //                     ]
+        //                 ];
+        //             })->toArray(),
+        //             'tests' => [],
+        //         ];
+        //     }
 
-            // Filter out metrics where the value is null
-            $filteredMetrics = [];
-            if ($playerTest->metrics) {
-                foreach ($playerTest->metrics->getAttributes() as $key => $value) {
-                    if (
-                        $value !== null && $key !== 'id' && $key !== 'player_test_id' &&
-                        $key !== 'created_at' && $key !== 'updated_at'
-                    ) {
-                        $filteredMetrics[$key] = $value;
-                    }
-                }
-            }
+        //     // Filter out metrics where the value is null
+        //     $filteredMetrics = [];
+        //     if ($playerTest->metrics) {
+        //         foreach ($playerTest->metrics->getAttributes() as $key => $value) {
+        //             if (
+        //                 $value !== null && $key !== 'id' && $key !== 'player_test_id' &&
+        //                 $key !== 'created_at' && $key !== 'updated_at'
+        //             ) {
+        //                 $filteredMetrics[$key] = $value;
+        //             }
+        //         }
+        //     }
 
-            $groupedByPlayer[$playerId]['tests'][] = [
-                'id' => $playerTest->id,
-                'testId' => $playerTest->test_id,
-                'testName' => $playerTest->test->name,
-                'sessionId' => $playerTest->session_id,
-                'metrics' => $filteredMetrics,
-                'results' => $playerTest->results,
-                'recordedAt' => $playerTest->recorded_at,
-            ];
-        }
+        //     $groupedByPlayer[$playerId]['tests'][] = [
+        //         'id' => $playerTest->id,
+        //         'testId' => $playerTest->test_id,
+        //         'testName' => $playerTest->test->name,
+        //         'sessionId' => $playerTest->session_id,
+        //         'metrics' => $filteredMetrics,
+        //         'results' => $playerTest->results,
+        //         'recordedAt' => $playerTest->recorded_at,
+        //     ];
+        // }
 
-        return array_values($groupedByPlayer);
+        return $playerTests;
+        // return array_values($groupedByPlayer);
     }
     public function update(
         string $playerTestId,
@@ -159,7 +160,7 @@ class PlayerTestService
         array $updatePlayerTestDto
     ) {
         // Validate that required metrics are present
-        $this->validateMetricsOnUpdate($updatePlayerTestDto, $requiredMetrics);
+        // $this->validateMetricsOnUpdate($updatePlayerTestDto, $requiredMetrics);
 
         $testMetric = TestMetrics::findOrFail($playerTestId);
         $testMetric->update($updatePlayerTestDto);

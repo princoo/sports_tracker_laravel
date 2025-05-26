@@ -6,6 +6,7 @@ use App\Models\Test;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class TestService
 {
@@ -31,7 +32,10 @@ class TestService
 
     public function update($id, array $data)
     {
-        $test = $this->findOne($id);
+        $test = Test::find($id);
+        if (!$test) {
+            return null;
+        }
         $test->update($data);
         return $test;
     }

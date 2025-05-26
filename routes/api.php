@@ -38,17 +38,31 @@ Route::get('/login', function () {
     // return response()->json(['error' => 'Login required.'], 401);
 })->name('login');
 
-Route::post('/signup', [UserController::class, 'register'])->middleware(CheckUserExists::class);
-Route::post('/login', [UserController::class, 'login']);
+// In routes/api.php
+Route::middleware('auth:api')->get('/user', function (Request $request) {
+    // Return the authenticated user
+    $user = $request->user();
+    $user->load('role');
+    $user->load('profile');
+    return response()->json([
+        'message' => 'Loged in user',
+        'data' => [
+            'user' => $user
+        ],
+    ]);
+});
+
+Route::post('/auth/signup', [UserController::class, 'register'])->middleware(CheckUserExists::class);
+Route::post('/auth/login', [UserController::class, 'login']);
 Route::patch('/roles/{userId}', [RoleController::class, 'changeUserRole'])->middleware('auth:api', RoleMiddleware::class . ':HSO');
 
 // site routes
 Route::get('/site', [SiteController::class, 'getAllSites'])->middleware('auth:api', RoleMiddleware::class . ':USER,HSO,FOOTBALL_DIRECTOR,CEO,TECHNICIAN,COACH');
 Route::post('/site', [SiteController::class, 'createSite'])->middleware('auth:api', RoleMiddleware::class . ':USER,HSO,FOOTBALL_DIRECTOR,CEO,TECHNICIAN,COACH', CheckSiteExists::class);
+Route::get('/site/free-coach', [SiteController::class, 'findCoachesWithNoSite'])->middleware('auth:api', RoleMiddleware::class . ':USER,HSO,FOOTBALL_DIRECTOR,CEO,TECHNICIAN,COACH');
 Route::get('/site/{siteId}', [SiteController::class, 'findOne'])->middleware('auth:api', RoleMiddleware::class . ':USER,HSO,FOOTBALL_DIRECTOR,CEO,TECHNICIAN,COACH',); // make a middleware to check if the site id in the params exists
 Route::patch('/site/{siteId}', [SiteController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':USER,HSO,FOOTBALL_DIRECTOR,CEO,TECHNICIAN,COACH', CheckUpdatedNameExists::class);
 Route::delete('/site/{siteId}', [SiteController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':USER,HSO,FOOTBALL_DIRECTOR,CEO,TECHNICIAN,COACH'); // make a middleware to check if the site id in the params exists
-Route::get('/site/free-coach', [SiteController::class, 'findCoachesWithNoSite'])->middleware('auth:api', RoleMiddleware::class . ':USER,HSO,FOOTBALL_DIRECTOR,CEO,TECHNICIAN,COACH');
 
 // coach on site routes
 Route::post('/coach-on-site', [CoachOnSiteController::class, 'create'])->middleware('auth:api', RoleMiddleware::class . ':HSO,FOOTBALL_DIRECTOR', CheckCoachOnSiteExists::class, CheckSiteIdExists::class);
@@ -68,7 +82,8 @@ Route::delete('/players/{player_id}', [PlayerController::class, 'remove'])->midd
 Route::post('/test', [TestController::class, 'create'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckTestNameExists::class);
 Route::get('/test', [TestController::class, 'findAll'])->middleware('auth:api');
 Route::get('/test/{test_id}', [TestController::class, 'findOne'])->middleware('auth:api', CheckTestIdExists::class);
-Route::patch('/test/{test_id}', [TestController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class, TestCheckUpdatedNameExists::class);
+Route::patch('/test/{test_id}', [TestController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', TestCheckUpdatedNameExists::class);
+// Route::patch('/test/{test_id}', [TestController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class, TestCheckUpdatedNameExists::class);
 Route::delete('/test/{test_id}', [TestController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':HSO,ADMIN', CheckTestIdExists::class);
 
 // TestSession routes
@@ -85,5 +100,5 @@ Route::get('/player-test', [PlayerTestController::class, 'findAll'])->middleware
 Route::get('/player-test/player/{player_id}', [PlayerTestController::class, 'findAllByPlayer'])->middleware('auth:api');
 Route::get('/player-test/session/{session_id}', [PlayerTestController::class, 'findBySession'])->middleware('auth:api', CheckSessionIdExists::class);
 Route::get('/player-test/{player_test_id}', [PlayerTestController::class, 'findOne'])->middleware('auth:api');
-Route::patch('/player-test/{site_id}/{test_metric_id}', [PlayerTestController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':TECHNICIAN,COACH', CheckSiteIdExists::class, CheckTestMetricsIdExists::class);
-Route::patch('/player-test/{site_id}/{player_test_id}', [PlayerTestController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':HSO,COACH', CheckSiteIdExists::class, CheckPlayerTestIdExists::class);
+Route::patch('/player-test/{site_id}/{test_metric_id}', [PlayerTestController::class, 'update'])->middleware('auth:api', RoleMiddleware::class . ':HSO,TECHNICIAN,COACH', CheckSiteIdExists::class, CheckTestMetricsIdExists::class);
+Route::delete('/player-test/{site_id}/{player_test_id}', [PlayerTestController::class, 'remove'])->middleware('auth:api', RoleMiddleware::class . ':HSO,COACH', CheckSiteIdExists::class, CheckPlayerTestIdExists::class);

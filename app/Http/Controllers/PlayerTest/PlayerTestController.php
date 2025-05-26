@@ -16,7 +16,7 @@ class PlayerTestController extends Controller
 
     public function create(
         Request $request,
-        // string $site_id,
+        string $site_id,
         string $test_id,
         string $player_id,
         // array $createPlayerTestDto
@@ -80,7 +80,7 @@ class PlayerTestController extends Controller
             'data' => $data
         ]);
     }
-    public function remove(string $player_test_id)
+    public function remove(string $site_id,string $player_test_id)
     {
         $this->playerTestService->remove($player_test_id);
         return response()->json([
