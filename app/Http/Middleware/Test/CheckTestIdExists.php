@@ -22,11 +22,13 @@ class CheckTestIdExists
         if (!$id) {
             return response()->json(['error' => 'ID for test is required'], 400);
         }
-        $test = Test::where('id', $id)->exists();
+        $test = Test::find($id); // or ->where('id', $id)->first()
+
         if (!$test) {
             return response()->json(['error' => 'Test with this ID does not exist.'], 400);
         }
 
+        $request->merge(['required_metrics' => $test->required_metrics]);
         return $next($request);
     }
 }

@@ -18,15 +18,15 @@ class CheckActiveSessions
     {
         $date = $request->input('date');
         if (!$date) {
-            return response()->json(['error' => 'Date for test session is required'], 400);
+            return response()->json(['message' => 'Date for test session is required'], 400);
         }
         $activeSessions = $this->testSessionService->findActive($date);
         if ($activeSessions->count() > 0) {
-            return response()->json(['error' => 'You already have an active session.'], 400);
+            return response()->json(['message' => 'You already have an active session.'], 400);
         }
         $sessionsOnSameDay = $this->testSessionService->findOnSameDay($date);
         if ($sessionsOnSameDay->count() > 0) {
-            return response()->json(['error' => 'You have already set a session for this day.'], 400);
+            return response()->json(['message' => 'You have already set a session for this day.'], 400);
         }
         return $next($request);
     }

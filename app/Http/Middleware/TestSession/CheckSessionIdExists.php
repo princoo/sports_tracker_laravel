@@ -19,11 +19,11 @@ class CheckSessionIdExists
     {
         $id = $request->route('session_id') ?? $request->input('session_id');
         if (!$id) {
-            return response()->json(['error' => 'ID for test session is required'], 400);
+            return response()->json(['message' => 'ID for test session is required'], 400);
         }
         $testSession = $this->testSessionService->findOne($id);
         if (!$testSession) {
-            return response()->json(['error' => 'Test session with this ID does not exist.'], 400);
+            return response()->json(['message' => 'Test session with this ID does not exist.'], 400);
         }
         return $next($request);
     }

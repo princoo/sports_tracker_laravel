@@ -99,7 +99,8 @@ class TestSessionService
     {
         return TestSession::where('is_active', true)
             ->where('status', SessionStatus::ACTIVE->value)
-            ->with(['tests.test'])
+            ->with(['sessionTests.test'])
+            // ->with(['tests.test'])
             ->first();
     }
 

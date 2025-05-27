@@ -75,7 +75,9 @@ class UserController extends Controller
         $token = $user->createToken('MyApp')->accessToken;
         return response()->json([
             'message' => 'User login successfully',
-            'token' => $token,
+            'data' => [
+                'access_token' => $token
+            ],
             'user' => $user->name
         ]);
     }

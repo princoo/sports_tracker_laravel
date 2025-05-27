@@ -6,6 +6,10 @@ use App\Http\Middleware\Coach\CheckCoachOnSiteExists;
 use App\Http\Middleware\Coach\CheckPlayerCoach;
 use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\Player\CheckPlayerExists;
+use App\Http\Middleware\PlayerTest\ActiveSessionMiddleware;
+use App\Http\Middleware\PlayerTest\CheckDuplicateSessionTest;
+use App\Http\Middleware\PlayerTest\CheckPlayerTestIdExists;
+use App\Http\Middleware\PlayerTest\CheckTestMetricsIdExists;
 use App\Http\Middleware\ResponseFormatter;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\Site\CheckSiteExists;
@@ -69,6 +73,14 @@ return Application::configure(basePath: dirname(__DIR__))
             CheckSessionInUse::class,
             'CheckActiveSessions',
             CheckActiveSessions::class,
+            'CheckDuplicateSessionTest',
+            CheckDuplicateSessionTest::class,
+            'CheckPlayerTestIdExists',
+            CheckPlayerTestIdExists::class,
+            'CheckTestMetricsIdExists',
+            CheckTestMetricsIdExists::class,
+            'ActiveSession',
+            ActiveSessionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

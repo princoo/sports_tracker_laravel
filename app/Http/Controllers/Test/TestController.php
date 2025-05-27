@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Test;
 use App\Http\Controllers\Controller;
 use App\Services\Test\TestService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TestController extends Controller
 {
@@ -42,6 +43,7 @@ class TestController extends Controller
             'description' => 'nullable|string',
             'required_metrics' => 'required|array',
         ]);
+                Log::info('Incoming data:', $request->all());
         $data = $this->testService->update($test_id, $request->all());
         return response()->json(['message' => 'Test updated successfully', 'data' => $data]);
     }
